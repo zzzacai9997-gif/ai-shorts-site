@@ -1,11 +1,83 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>AI 쇼츠 자동화</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .card {
+      background: #020617;
+      padding: 40px;
+      border-radius: 16px;
+      width: 360px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 24px;
+    }
+    textarea {
+      width: 100%;
+      height: 90px;
+      margin: 12px 0;
+      border-radius: 8px;
+      border: none;
+      padding: 10px;
+      font-size: 14px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      background: #6366f1;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #4f46e5;
+    }
+    .status {
+      margin-top: 12px;
+      font-size: 14px;
+      color: #a5b4fc;
+    }
+  </style>
 </head>
 <body>
-  <h1>AI 쇼츠 자동화 테스트</h1>
-  <p>GitHub Pages 연결 성공 🎉</p>
+  <div class="card">
+    <h1>🎬 AI 쇼츠 자동화</h1>
+    <p>주제 한 줄 입력 → 자동 생성</p>
+
+    <textarea id="topic" placeholder="예: 지브리 감성 고양이 일상 쇼츠"></textarea>
+
+    <button onclick="run()">쇼츠 생성 시작</button>
+
+    <div class="status" id="status"></div>
+  </div>
+
+  <script>
+    function run() {
+      const topic = document.getElementById("topic").value;
+      if (!topic) {
+        alert("주제를 입력하세요");
+        return;
+      }
+      document.getElementById("status").innerText =
+        "⏳ AI가 쇼츠를 생성 중입니다… (n8n 연결 예정)";
+      
+      // 👉 다음 단계에서 여기에 n8n Webhook URL 연결
+      // fetch("https://n8n-webhook-url", { method: "POST", body: JSON.stringify({ topic }) })
+    }
+  </script>
 </body>
 </html>
