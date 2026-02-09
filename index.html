@@ -1,26 +1,71 @@
-<script>
-  function run() {
-    const topic = document.getElementById("topic").value;
-    const status = document.getElementById("status");
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI Shorts Automation Lab</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="header">
+      <h1>AI 쇼츠 생성기</h1>
+      <p class="sub">주제 입력 → 대본 생성 → n8n 자동화 호출</p>
+      <div class="status" id="status">대기 중</div>
+    </header>
 
-    if (!topic) {
-      alert("주제를 입력하세요");
-      return;
-    }
+    <main class="grid">
+      <section class="card">
+        <h2>1) 입력</h2>
+        <label class="label">주제</label>
+        <input id="topic" class="input" placeholder="예: 지하철에서 절대 하면 안 되는 3가지" />
 
-    status.innerText = "⏳ n8n 자동화 실행 중…";
+        <label class="label">톤/분위기</label>
+        <select id="tone" class="input">
+          <option value="힐링">힐링</option>
+          <option value="공감">공감</option>
+          <option value="웃김">웃김</option>
+          <option value="공포">공포</option>
+        </select>
 
-    fetch("https://zzzacai77.app.n8n.cloud/webhook/164dec69-3078-4600-b3a6-393bca0a8910", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ topic })
-    })
-    .then(async (res) => {
-      const text = await res.text();   // json 아닐 수도 있어서 안전하게
-      status.innerText = "✅ 응답: " + text;
-    })
-    .catch((err) => {
-      status.innerText = "❌ 실패: " + err.message;
-    });
-  }
-</script>
+        <label class="label">언어</label>
+        <select id="lang" class="input">
+          <option value="ko">한국어</option>
+          <option value="es">스페인어</option>
+        </select>
+
+        <div class="row">
+          <button id="btnGenerate" class="btn primary">대본 생성 + n8n 호출</button>
+          <button id="btnClear" class="btn">지우기</button>
+        </div>
+
+        <p class="hint">
+          ⚠️ 버튼이 n8n Webhook으로 POST 요청을 보냅니다. (아래 WEBHOOK_URL만 바꾸면 됨)
+        </p>
+      </section>
+
+      <section class="card">
+        <h2>2) 결과</h2>
+        <label class="label">응답(JSON)</label>
+        <pre id="result" class="result">{}</pre>
+
+        <label class="label">대본(있으면 자동 표시)</label>
+        <textarea id="script" class="textarea" placeholder="n8n 응답에 script가 있으면 여기 자동으로 들어와요."></textarea>
+
+        <div class="row">
+          <button id="btnCopy" class="btn">대본 복사</button>
+          <a class="btn link" id="openN8N" href="#" target="_blank" rel="noreferrer">n8n 링크 열기</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>GitHub Pages</span>
+      <span class="dot">•</span>
+      <span>n8n Webhook 연동</span>
+    </footer>
+  </div>
+
+  <script src="./script.js"></script>
+</body>
+</html>
