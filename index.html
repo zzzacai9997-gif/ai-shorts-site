@@ -66,18 +66,31 @@
   </div>
 
   <script>
-    function run() {
-      const topic = document.getElementById("topic").value;
-      if (!topic) {
-        alert("주제를 입력하세요");
-        return;
-      }
-      document.getElementById("status").innerText =
-        "⏳ AI가 쇼츠를 생성 중입니다… (n8n 연결 예정)";
-      
-      // 👉 다음 단계에서 여기에 n8n Webhook URL 연결
-      // fetch("https://n8n-webhook-url", { method: "POST", body: JSON.stringify({ topic }) })
+  function run() {
+    const topic = document.getElementById("topic").value;
+
+    if (!topic) {
+      alert("주제를 입력하세요");
+      return;
     }
-  </script>
-</body>
-</html>
+
+    document.getElementById("status").innerText =
+      "⏳ AI 자동화를 실행 중입니다…";
+
+    fetch("https://YOUR-N8N-DOMAIN/webhook/shorts-run", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ topic })
+    })
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById("status").innerText =
+        "✅ 완료! " + (data.result_url || "생성 완료");
+    })
+    .catch(e => {
+      document.getElementById("status").innerText =
+        "❌ 실패: " + e.message;
+    });
+  }
+</script>
+
