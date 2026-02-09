@@ -74,6 +74,13 @@
       status.innerText = "⏳ n8n 자동화 실행 중…";
 
 fetch("https://zzzacai77.app.n8n.cloud/webhook/164dec69-3078-4600-b3a6-393bca0a8910", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({ topic })
+})
+{
 
 
 
