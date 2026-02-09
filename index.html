@@ -65,49 +65,35 @@
     <div class="status" id="status"></div>
   </div>
 
-  <script>
+<script>
   function run() {
     const topic = document.getElementById("topic").value;
+    const status = document.getElementById("status");
 
     if (!topic) {
       alert("주제를 입력하세요");
       return;
     }
 
-    document.getElementById("status").innerText =
-      "⏳ AI 자동화를 실행 중입니다…";
+    status.innerText = "⏳ AI 자동화를 실행 중입니다…";
 
-fetch("https://zzzacai77.app.n8n.cloud/webhook/xxxxx", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    topic: document.getElementById("topic").value
-  })
-})
-.then(res => res.json())
-.then(data => {
-  alert("성공! " + JSON.stringify(data));
-})
-.catch(err => {
-  alert("실패: " + err.message);
-});
-
-
-
+    fetch("https://zzzacai77.app.n8n.cloud/webhook/xxxxx", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify({ topic })
     })
-    .then(r => r.json())
-    .then(data => {
-      document.getElementById("status").innerText =
-        "✅ 완료! " + (data.result_url || "생성 완료");
+    .then(res => {
+      if (!res.ok) throw new Error("서버 응답 오류");
+      return res.json();
     })
-    .catch(e => {
-      document.getElementById("status").innerText =
-        "❌ 실패: " + e.message;
+    .then(data => {
+      status.innerText = "✅ 완료! 서버 응답 성공";
+      alert("성공!\n" + JSON.stringify(data, null, 2));
+    })
+    .catch(err => {
+      status.innerText = "❌ 실패: " + err.message;
     });
   }
 </script>
