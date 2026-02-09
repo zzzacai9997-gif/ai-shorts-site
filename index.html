@@ -12,6 +12,7 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
+      margin: 0;
     }
     .card {
       background: #020617;
@@ -65,36 +66,37 @@
     <div class="status" id="status"></div>
   </div>
 
-<script>
-  function run() {
-    const topic = document.getElementById("topic").value;
-    const status = document.getElementById("status");
+  <script>
+    function run() {
+      const topic = document.getElementById("topic").value.trim();
+      const status = document.getElementById("status");
 
-    if (!topic) {
-      alert("주제를 입력하세요");
-      return;
+      if (!topic) {
+        alert("주제를 입력하세요");
+        return;
+      }
+
+      status.innerText = "⏳ AI 자동화를 실행 중입니다…";
+
+      fetch("https://zzzacai77.app.n8n.cloud/webhook/👉여기_프로덕션_URL👈", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ topic })
+      })
+      .then(res => {
+        if (!res.ok) throw new Error("서버 응답 오류");
+        return res.json();
+      })
+      .then(data => {
+        status.innerText = "✅ 완료! n8n에서 자동화 실행됨";
+        console.log(data);
+      })
+      .catch(err => {
+        status.innerText = "❌ 실패: " + err.message;
+      });
     }
-
-    status.innerText = "⏳ AI 자동화를 실행 중입니다…";
-
-    fetch("https://zzzacai77.app.n8n.cloud/webhook/xxxxx", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ topic })
-    })
-    .then(res => {
-      if (!res.ok) throw new Error("서버 응답 오류");
-      return res.json();
-    })
-    .then(data => {
-      status.innerText = "✅ 완료! 서버 응답 성공";
-      alert("성공!\n" + JSON.stringify(data, null, 2));
-    })
-    .catch(err => {
-      status.innerText = "❌ 실패: " + err.message;
-    });
-  }
-</script>
-
+  </script>
+</body>
+</html>
