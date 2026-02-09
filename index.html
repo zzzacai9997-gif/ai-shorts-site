@@ -77,18 +77,23 @@
     document.getElementById("status").innerText =
       "⏳ AI 자동화를 실행 중입니다…";
 
- fetch("https://zzzacai77.app.n8n.cloud/webhook/164dec69-3078-4600-b3a6-393bca0a8910", {
+fetch("https://zzzacai77.app.n8n.cloud/webhook/xxxxx", {
   method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ topic })
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    topic: document.getElementById("topic").value
+  })
 })
-.then(r => r.json())
-.then(data => document.getElementById("status").innerText =
-  "✅ 완료: " + JSON.stringify(data)
-)
-.catch(e => document.getElementById("status").innerText =
-  "❌ 실패: " + e.message
-);
+.then(res => res.json())
+.then(data => {
+  alert("성공! " + JSON.stringify(data));
+})
+.catch(err => {
+  alert("실패: " + err.message);
+});
+
 
 
       method: "POST",
