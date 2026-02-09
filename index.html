@@ -12,7 +12,6 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
-      margin: 0;
     }
     .card {
       background: #020617;
@@ -44,13 +43,9 @@
       color: white;
       cursor: pointer;
     }
-    button:hover {
-      background: #4f46e5;
-    }
     .status {
       margin-top: 12px;
       font-size: 14px;
-      color: #a5b4fc;
     }
   </style>
 </head>
@@ -68,7 +63,7 @@
 
   <script>
     function run() {
-      const topic = document.getElementById("topic").value.trim();
+      const topic = document.getElementById("topic").value;
       const status = document.getElementById("status");
 
       if (!topic) {
@@ -76,23 +71,18 @@
         return;
       }
 
-      status.innerText = "⏳ AI 자동화를 실행 중입니다…";
+      status.innerText = "⏳ n8n 자동화 실행 중…";
 
-     https://zzzacai77.app.n8n.cloud/webhook/164dec69-3078-4600-b3a6-393bca0a8910
-
+      fetch("⬇️⬇️⬇️ 여기에 n8n 프로덕션 URL 붙여넣기", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({ topic })
       })
-      .then(res => {
-        if (!res.ok) throw new Error("서버 응답 오류");
-        return res.json();
-      })
+      .then(res => res.json())
       .then(data => {
-        status.innerText = "✅ 완료! n8n에서 자동화 실행됨";
-        console.log(data);
+        status.innerText = "✅ 성공: " + JSON.stringify(data);
       })
       .catch(err => {
         status.innerText = "❌ 실패: " + err.message;
