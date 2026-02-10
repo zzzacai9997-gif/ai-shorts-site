@@ -83,7 +83,7 @@ function setBusy(isBusy) {
 // ✅ 1개 생성
 // ===============================
 async function generateOne() {
-  if (!WEBHOOK_URL || WEBHOOK_URL.includes("여기에_너의_WEBHOOK_URL")) {
+  if (!WEBHOOK_URL || WEBHOOK_URL.includes("https://hook.eu1.make.com/np7g2x9566v8tqg4w383m2f3jdhik3or")) {
     setResult("❌ WEBHOOK_URL을 먼저 넣어줘! (script.js 상단)");
     return;
   }
@@ -142,7 +142,7 @@ const BATCH_AS_MULTI_CALLS = false;
 const SEP = "\n\n===== 구분선 =====\n\n";
 
 async function generateBatch30() {
-  if (!WEBHOOK_URL || WEBHOOK_URL.includes("여기에_너의_WEBHOOK_URL")) {
+  if (!WEBHOOK_URL || WEBHOOK_URL.includes("https://hook.eu1.make.com/np7g2x9566v8tqg4w383m2f3jdhik3or")) {
     setResult("❌ WEBHOOK_URL을 먼저 넣어줘! (script.js 상단)");
     return;
   }
