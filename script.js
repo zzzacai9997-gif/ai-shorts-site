@@ -1,5 +1,6 @@
 // =========================
-// AI 쇼츠 · 롱폼 대본 생성기 (조회수/완주율 + 자동화 업그레이드)
+// AI 쇼츠 · 롱폼 대본 생성기 (C: 주제 일괄 생성 자동화 포함)
+// - HTML 수정 없이: JS가 "주제 일괄 입력칸 + 버튼"을 자동 삽입
 // =========================
 
 const $ = (id) => document.getElementById(id);
@@ -17,7 +18,7 @@ function shuffle(arr) {
   return a;
 }
 
-// ---- 카테고리별 훅(첫 1~2줄) : 완주율 핵심 ----
+// ---- 카테고리별 훅 ----
 const HOOKS = {
   "힐링/감성": [
     "괜찮은 척했는데… 오늘은 좀 무너졌다.",
@@ -63,7 +64,7 @@ const HOOKS = {
   ]
 };
 
-// ---- 말투별 마무리(저장/댓글 유도) ----
+// ---- 말투별 마무리 ----
 const CTA = {
   "담백": [
     "필요하면 저장해두세요.",
@@ -92,7 +93,7 @@ const CTA = {
   ]
 };
 
-// ---- 카테고리별 본문 포인트(3포인트 구조) ----
+// ---- 카테고리별 본문 포인트 ----
 const POINTS = {
   "힐링/감성": ["숨을 한 번 길게", "오늘 나를 탓하지 않기", "딱 한 가지를 내려놓기", "10분만 쉬기", "따뜻한 물 한 컵"],
   "생활꿀팁": ["라벨링으로 정리", "타이머 5분 청소", "자주 쓰는 건 한 곳에", "중복 구매 리스트", "습관화 체크"],
@@ -102,7 +103,7 @@ const POINTS = {
   "복지/지원금": ["지자체 홈페이지", "주민센터 문의", "자격 조건 확인", "신청 기간", "사기 링크 차단"]
 };
 
-// ---- 쇼츠 1편 만들기 (한 줄=한 컷) ----
+// ---- 쇼츠 1편 ----
 function buildShort(topic, category, tone) {
   const hook = pick(HOOKS[category] || HOOKS["힐링/감성"]);
   const pts = shuffle(POINTS[category] || POINTS["힐링/감성"]).slice(0, 3);
@@ -123,7 +124,7 @@ function buildShort(topic, category, tone) {
   ].join("\n");
 }
 
-// ---- 롱폼 1편 만들기 (5~10분 구조) ----
+// ---- 롱폼 1편 ----
 function buildLong(topic, category, tone) {
   const hook = pick(HOOKS[category] || HOOKS["힐링/감성"]);
   const pts = shuffle(POINTS[category] || POINTS["힐링/감성"]).slice(0, 5);
@@ -155,7 +156,7 @@ function buildLong(topic, category, tone) {
   ].join("\n");
 }
 
-// ---- 쇼츠 30개 양산 (표현 다양화) ----
+// ---- 쇼츠 30개 ----
 function buildShortBatch(topic, category, tone, n = 30) {
   let out = "===== 쇼츠 30개 =====\n";
   for (let i = 1; i <= n; i++) {
@@ -165,28 +166,9 @@ function buildShortBatch(topic, category, tone, n = 30) {
   return out.trim();
 }
 
-// =============
-// 버튼 연결 함수들
-// =============
-window.makeScript = function () {
-  const topic = $("topic").value || "오늘의 이야기";
-  const category = $("category").value;
-  const tone = $("tone").value;
-
-  const one = [
-    "===== 쇼츠 =====",
-    buildShort(topic, category, tone)
-  ].join("\n\n");
-
-  $("result").value = one;
-};
-
-window.runFullPipeline = function () {
-  const topic = $("topic").value || "오늘의 이야기";
-  const category = $("category").value;
-  const tone = $("tone").value;
-
-  const full = [
+// ---- 한 주제에 대한 풀 출력 ----
+function buildFullSet(topic, category, tone) {
+  return [
     "===== 쇼츠 =====",
     buildShort(topic, category, tone),
     "",
@@ -195,6 +177,100 @@ window.runFullPipeline = function () {
     "",
     buildShortBatch(topic, category, tone, 30)
   ].join("\n");
+}
 
-  $("result").value = full;
+// ====================
+// 기존 버튼용 함수(유지)
+// ====================
+window.makeScript = function () {
+  const topic = $("topic").value || "오늘의 이야기";
+  const category = $("category").value;
+  const tone = $("tone").value;
+
+  const one = ["===== 쇼츠 =====", buildShort(topic, category, tone)].join("\n\n");
+  $("result").value = one;
 };
+
+window.runFullPipeline = function () {
+  const topic = $("topic").value || "오늘의 이야기";
+  const category = $("category").value;
+  const tone = $("tone").value;
+
+  $("result").value = buildFullSet(topic, category, tone);
+};
+
+// ====================
+// C: "주제 일괄 생성" UI를 자동 삽입
+// ====================
+function injectBatchUI() {
+  const topicInput = $("topic");
+  if (!topicInput) return;
+
+  // 이미 삽입됐으면 중복 방지
+  if (document.getElementById("batchTopics")) return;
+
+  // 주제 입력칸이 들어있는 카드 안에 넣기
+  // (가장 가까운 .card 찾아서 아래에 삽입)
+  const card = topicInput.closest(".card") || document.body;
+
+  const wrap = document.createElement("div");
+  wrap.style.marginTop = "12px";
+
+  wrap.innerHTML = `
+    <div style="margin-top:8px; font-size:13px; opacity:0.9;">주제 일괄 입력 (한 줄 = 한 주제)</div>
+    <textarea id="batchTopics" placeholder="예)
+지하철에서 멘탈 버티는 법
+새벽 3시 엘리베이터 괴담
+2026 설날 지원금 사기 피하기" style="min-height:140px;"></textarea>
+
+    <div style="display:flex; gap:10px;">
+      <button id="btnBatchRun">📦 주제 N개 일괄 생성</button>
+      <button id="btnBatchDownload">💾 일괄 결과 TXT 저장</button>
+    </div>
+
+    <div id="batchHint" style="margin-top:8px; font-size:12px; opacity:0.75;">
+      ※ 카테고리/말투는 위 선택값을 공통 적용. (원하면 다음에 주제별 설정도 가능)
+    </div>
+  `;
+
+  card.appendChild(wrap);
+
+  $("btnBatchRun").addEventListener("click", () => {
+    const raw = $("batchTopics").value || "";
+    const topics = raw.split("\n").map(t => t.trim()).filter(Boolean);
+    if (topics.length === 0) {
+      alert("주제를 한 줄에 하나씩 입력해줘!");
+      return;
+    }
+
+    const category = $("category").value;
+    const tone = $("tone").value;
+
+    let out = `##### 일괄 생성 결과 (총 ${topics.length}개) #####\n`;
+    topics.forEach((t, idx) => {
+      out += `\n\n==============================\n`;
+      out += `### ${idx + 1}. 주제: ${t}\n`;
+      out += `==============================\n\n`;
+      out += buildFullSet(t, category, tone);
+    });
+
+    $("result").value = out;
+  });
+
+  $("btnBatchDownload").addEventListener("click", () => {
+    const text = $("result").value || "";
+    if (!text.trim()) {
+      alert("저장할 결과가 없어! 먼저 생성 버튼부터 눌러줘.");
+      return;
+    }
+    const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "batch_scripts.txt";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+}
+
+// DOM 로드 후 UI 삽입
+document.addEventListener("DOMContentLoaded", injectBatchUI);
