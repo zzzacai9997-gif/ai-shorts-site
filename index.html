@@ -1,113 +1,173 @@
-너는 유튜브 전문 대본 작가다.
-쇼츠(30~60초)와 롱폼(5~10분) 콘텐츠를
-동일한 주제로 함께 기획·작성하는 역할이다.
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <title>AI 쇼츠 · 롱폼 대본 생성기</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      margin: 0;
+      font-family: "Noto Sans KR", system-ui, sans-serif;
+      background: #0f1225;
+      color: #ffffff;
+    }
+    .wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+    h1 {
+      margin-bottom: 6px;
+    }
+    .desc {
+      opacity: 0.8;
+      margin-bottom: 24px;
+    }
+    .card {
+      background: rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    label {
+      font-size: 13px;
+      opacity: 0.9;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      margin-top: 6px;
+      margin-bottom: 16px;
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      font-size: 14px;
+    }
+    textarea {
+      min-height: 360px;
+      line-height: 1.6;
+    }
+    button {
+      background: linear-gradient(135deg, #6c7cff, #b26bff);
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .footer {
+      font-size: 12px;
+      opacity: 0.6;
+      margin-top: 20px;
+      text-align: center;
+    }
+  </style>
+</head>
 
-목표:
-- 쇼츠: 조회수, 완주율, 저장률 극대화
-- 롱폼: 시청시간, 신뢰도, 채널 체류시간 극대화
+<body>
+  <div class="wrap">
+    <h1>🎬 AI 쇼츠 · 롱폼 대본 생성기</h1>
+    <div class="desc">
+      버튼 하나로 쇼츠 + 롱폼 + 30개 양산
+    </div>
 
-────────────────
-[입력값]
-- 주제: {주제}
-- 카테고리: {카테고리}
-- 말투: {말투}
-- 출력 유형: {쇼츠 / 롱폼 / 쇼츠+롱폼}
-────────────────
+    <div class="card">
+      <label>주제</label>
+      <input id="topic" placeholder="예: 지하철에서 멘탈 흔들릴 때 버티는 법" />
 
-[공통 원칙]
-- 한국어
-- 감정·상황 중심
-- 한 문장 = 한 자막/한 호흡
-- 불필요한 설명 금지
-- AI 느낌 제거
+      <label>카테고리</label>
+      <select id="category">
+        <option>힐링/감성</option>
+        <option>생활꿀팁</option>
+        <option>공포/괴담</option>
+        <option>연애/관계</option>
+        <option>자기계발</option>
+        <option>복지/지원금</option>
+      </select>
 
-────────────────
-[출력 유형별 규칙]
+      <label>말투</label>
+      <select id="tone">
+        <option>담백</option>
+        <option>다정</option>
+        <option>음습</option>
+        <option>빠름</option>
+        <option>단호</option>
+      </select>
 
-▶ 쇼츠
-- 길이: 30~60초
-- 줄 수: 6~10줄
-- 한 줄 = 한 컷
-- 빠른 몰입, 여운 중심
-- 결론은 말하지 않고 남겨둘 것
+      <button onclick="makeScript()">대본 하나 만들기</button>
 
-▶ 롱폼
-- 길이: 5~10분
-- 문단 구성
-- 흐름: 문제 제기 → 경험/사례 → 생각의 확장 → 정리
-- 중간에 최소 3번 시청자 질문 삽입
-- 끝에 다음 영상 떡밥 1개 포함
+      <button onclick="runFullPipeline()">
+        🚀 쇼츠 + 롱폼 + 30개 풀 생성
+      </button>
+    </div>
 
-▶ 쇼츠+롱폼
-- 같은 주제로
-  1) 쇼츠 1개
-  2) 롱폼 1개
-- 롱폼은 쇼츠의 “뒷이야기” 구조
+    <div class="card">
+      <label>결과 대본</label>
+      <textarea id="result"></textarea>
+    </div>
 
-────────────────
-[카테고리별 디테일 가이드]
+    <div class="footer">
+      © AI Shorts Automation
+    </div>
+  </div>
 
-▶ 힐링/감성
-- 쇼츠: 공감 + 침묵의 여운
-- 롱폼: 하루 이야기, 생각의 흐름
+<script>
+function makeScript() {
+  const topic = document.getElementById("topic").value || "오늘의 이야기";
+  const cat = document.getElementById("category").value;
+  const tone = document.getElementById("tone").value;
 
-▶ 생활꿀팁
-- 쇼츠: 한 가지 핵심
-- 롱폼: 이유 + 사례 + 응용
-
-▶ 공포/괴담
-- 쇼츠: 한 장면, 한 순간
-- 롱폼: 사건 전체 재구성
-
-▶ 연애/관계
-- 쇼츠: 감정의 포인트
-- 롱폼: 관계의 맥락
-
-▶ 자기계발
-- 쇼츠: 인식 전환
-- 롱폼: 루틴/사고방식
-
-▶ 복지/지원금
-- 쇼츠: 경고/요약
-- 롱폼: 조건/방법/주의사항
-
-────────────────
-[말투 적용]
-- 담백 / 다정 / 음습 / 빠름 / 단호
-- 쇼츠·롱폼 모두 동일 톤 유지
-
-────────────────
-[출력 형식]
-
-===== 쇼츠 =====
+  const script =
+`===== 쇼츠 =====
 [오프닝]
-(1줄)
+${topic}… 이 얘기, 지금 꼭 해야 할 것 같았어요.
 
 [본문]
-(4~6줄)
+괜찮은 척했지만,
+사실은 다 느끼고 있었어요.
+그래도 오늘을 버텼다는 것.
 
 [마무리]
-(1~2줄)
+필요할 때, 다시 보세요.
+`;
 
-===== 롱폼 =====
-[도입]
-(1~2문단)
+  document.getElementById("result").value = script;
+}
 
-[본론 1]
-(사례/경험)
+function runFullPipeline() {
+  const topic = document.getElementById("topic").value || "오늘의 이야기";
 
-[본론 2]
-(생각 확장 + 질문)
+  let out = "";
 
-[본론 3]
-(정리 전 단계)
+  out += "===== 쇼츠 =====\n";
+  out += "[오프닝]\n";
+  out += topic + "… 이 얘기, 지금 꼭 해야 할 것 같았어요.\n\n";
+  out += "[본문]\n";
+  out += "괜찮은 척했지만,\n";
+  out += "사실은 다 느끼고 있었어요.\n";
+  out += "그래도 오늘을 버텼다는 것.\n\n";
+  out += "[마무리]\n";
+  out += "이 영상, 필요할 때 다시 보세요.\n\n";
 
-[마무리]
-(여운 + 다음 영상 떡밥)
+  out += "===== 롱폼 =====\n";
+  out += "[도입]\n";
+  out += topic + "에 대해 요즘 자주 생각합니다.\n";
+  out += "이건 특별한 이야기가 아니라, 누구에게나 있는 순간이죠.\n\n";
 
-────────────────
-[중요]
-- 이모지 사용 금지
-- 설명문 출력 금지
-- 프롬프트 설명 금지
-- 오직 대본만 출력
+  out += "[본론]\n";
+  out += "우리는 비슷한 상황에서 같은 감정을 반복합니다.\n";
+  out += "그 감정을 외면하지 않는 게 중요해요.\n\n";
+
+  out += "[마무리]\n";
+  out += "다음 영상에서는 이 이야기를 조금 더 이어가볼게요.\n\n";
+
+  out += "===== 쇼츠 30개 =====\n";
+  for (let i = 1; i <= 30; i++) {
+    out += "\n--- " + i + " ---\n";
+    out += topic + "\n";
+    out += "괜찮은 척했지만, 다 느끼고 있었어요.\n";
+    out += "그래도 오늘을 버텼다는 것만으로 충분해요.\n";
+  }
+
+  document.getElementById("result").value = out;
+}
+</script>
+</body>
+</html>
