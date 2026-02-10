@@ -1,3 +1,13 @@
+document.addEventListener("DOMContentLoaded", () => {
+  injectBatchUI();
+  injectSendToMakeButton();
+});
+
+// GitHub Pages 캐시/지연 대비용 (중요)
+setTimeout(() => {
+  injectBatchUI();
+  injectSendToMakeButton();
+}, 1000);
 const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/np7g2x9566v8tqg4w383m2f3jdhik3or";
 
 // AI 쇼츠 · 롱폼 대본 생성기 (C: 주제 일괄 생성 자동화 포함)
