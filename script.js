@@ -49,20 +49,42 @@ ready(() => {
     genStatus.textContent = "✅ 30개 생성 완료";
   };
 
-  // ✅ Make로 보내기 (여기 fetch 있음)
-  makeBtn.onclick = async () => {
-    const t = (topic.value || "").trim();
-    if (!t) { uiStatus.textContent = "❌ 주제를 입력하세요."; return; }
+  // ✅ Make로 보내기 (sendBeacon 우선)
+makeBtn.onclick = () => {
+  const t = (topic.value || "").trim();
+  if (!t) { uiStatus.textContent = "❌ 주제를 입력하세요."; return; }
 
-    uiStatus.textContent = "⏳ Make로 전송중…";
+  const payload = {
+    topic: t,
+    category: category.value,
+    tone: tone.value,
+    script: result.value || "",
+    sentAt: new Date().toISOString()
+  };
 
-    const payload = {
-      topic: t,
-      category: category.value,
-      tone: tone.value,
-      script: result.value || "",
-      sentAt: new Date().toISOString()
-    };
+  uiStatus.textContent = "⏳ Make로 전송중…";
+
+  try {
+    // ✅ 1) sendBeacon (가장 안정적)
+    const ok = navigator.sendBeacon(MAKE_WEBHOOK_URL, JSON.stringify(payload));
+    if (ok) {
+      uiStatus.textContent = "✅ 전송 요청 보냄 (beacon)";
+      return;
+    }
+  } catch (e) {
+    // 무시하고 fetch로 fallback
+  }
+
+  // ✅ 2) fetch fallback: headers 제거 (프리플라이트 최소화)
+  fetch(MAKE_WEBHOOK_URL, {
+    method: "POST",
+    mode: "no-cors",
+    body: JSON.stringify(payload)
+  });
+
+  uiStatus.textContent = "✅ 전송 요청 보냄 (fetch no-cors)";
+};
+
 
     try {
       // ✅ CORS 안정 옵션
