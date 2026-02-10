@@ -96,3 +96,45 @@ ready(() => {
     }
   };
 });
+// ===============================
+// Make로 보내기 버튼 (핵심)
+// ===============================
+ready(() => {
+  const btnMake = document.getElementById("btnMake");
+
+  if (!btnMake) {
+    console.error("❌ btnMake 버튼 못 찾음");
+    return;
+  }
+
+  btnMake.addEventListener("click", async () => {
+    console.log("🚀 Make로 보내기 클릭됨");
+
+    const payload = {
+      topic: topic.value,
+      category: category.value,
+      tone: tone.value,
+      result: result.value,
+      createdAt: new Date().toISOString()
+    };
+
+    console.log("📦 전송 데이터:", payload);
+
+    try {
+      await fetch(MAKE_WEBHOOK_URL, {
+        method: "POST",
+        mode: "no-cors", // Make 웹훅 필수
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      uiStatus.innerText = "✅ Make로 전송 완료";
+      console.log("✅ Make 전송 성공");
+    } catch (err) {
+      console.error("❌ Make 전송 실패", err);
+      uiStatus.innerText = "❌ Make 전송 실패";
+    }
+  });
+});
