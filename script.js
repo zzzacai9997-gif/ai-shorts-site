@@ -75,3 +75,11 @@ window.injectSendToMakeButton = function () {
     console.error(e);
   }
 };
+// ❌ 기존
+// topicEl.parentElement.appendChild(btn);
+// topicEl.parentElement.appendChild(status);
+
+// ✅ 교체 (카드 안에 정확히 삽입)
+const card = topicEl.closest("div");
+card.appendChild(btn);
+card.appendChild(status);
