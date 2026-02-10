@@ -463,3 +463,111 @@ function injectSendToMakeButton() {
 
 document.addEventListener("DOMContentLoaded", injectSendToMakeButton);
 setTimeout(injectSendToMakeButton, 1000);
+// ✅ Make로 보내는 버튼 주입 (주제 입력칸 바로 아래)
+window.injectSendToMakeButton = function injectSendToMakeButton() {
+  try {
+    // 이미 버튼 있으면 중복 생성 방지
+    if (document.getElementById("sendToMakeBtn")) return;
+
+    // 1) "주제 입력칸" 찾기: input/textarea 중 가장 그럴듯한 것
+    const topicEl =
+      document.querySelector("#topic") ||
+      document.querySelector('input[placeholder*="주제"], textarea[placeholder*="주제"]') ||
+      document.querySelector("textarea") ||
+      document.querySelector('input[type="text"]');
+
+    if (!topicEl) {
+      console.warn("❌ 주제 입력칸을 못 찾았어요. (topicEl 없음)");
+      return;
+    }
+
+    // 2) "대본 결과" 찾기 (없으면 빈 값으로 전송)
+    const scriptEl =
+      document.querySelector("#script") ||
+      document.querySelector("#result") ||
+      document.querySelector('textarea[placeholder*="대본"], textarea[placeholder*="자막"]') ||
+      null;
+
+    // 3) 버튼 만들기
+    const btn = document.createElement("button");
+    btn.id = "sendToMakeBtn";
+    btn.type = "button";
+    btn.textContent = "Make로 보내기";
+
+    // 간단 스타일
+    btn.style.marginTop = "10px";
+    btn.style.padding = "10px 14px";
+    btn.style.borderRadius = "10px";
+    btn.style.border = "1px solid rgba(255,255,255,0.2)";
+    btn.style.cursor = "pointer";
+
+    // 상태 텍스트
+    const status = document.createElement("div");
+    status.id = "sendToMakeStatus";
+    status.style.marginTop = "8px";
+    status.style.fontSize = "14px";
+    status.style.opacity = "0.9";
+
+    // 4) 클릭 시 Make로 전송
+    btn.addEventListener("click", async () => {
+      const topic = (topicEl.value || "").trim();
+      const script = (scriptEl?.value || scriptEl?.textContent || "").trim();
+
+      if (!topic) {
+        status.textContent = "❌ 주제를 먼저 입력해줘.";
+        return;
+      }
+
+      // ⛳️ 여기 URL은 네가 위에서 이미 선언한 값 사용 (스크린샷에 있음)
+      // const 웹훅 URL 만들기 = "https://hook.eu1.make.com/....";
+      const makeUrl =
+        (typeof 웹훅URL만들기 !== "undefined" && 웹훅URL만들기) ||
+        (typeof makeWebhookUrl !== "undefined" && makeWebhookUrl) ||
+        (typeof MAKE_WEBHOOK_URL !== "undefined" && MAKE_WEBHOOK_URL) ||
+        null;
+
+      if (!makeUrl) {
+        status.textContent = "❌ Make 웹훅 URL 변수를 못 찾았어. (웹훅URL만들기 확인)";
+        return;
+      }
+
+      btn.disabled = true;
+      const oldText = btn.textContent;
+      btn.textContent = "전송중…";
+      status.textContent = "⏳ Make로 전송중…";
+
+      try {
+        const payload = {
+          topic,
+          script,
+          sentAt: new Date().toISOString(),
+          source: "ai-shorts-site"
+        };
+
+        const res = await fetch(makeUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        status.textContent = "✅ Make로 전송 완료!";
+      } catch (e) {
+        console.error(e);
+        status.textContent = "❌ 전송 실패 (URL/네트워크/Make 시나리오 확인)";
+      } finally {
+        btn.disabled = false;
+        btn.textContent = oldText;
+      }
+    });
+
+    // 5) 주제 입력칸 바로 아래에 붙이기
+    topicEl.insertAdjacentElement("afterend", status);
+    topicEl.insertAdjacentElement("afterend", btn);
+
+    console.log("✅ Make 버튼 주입 완료");
+  } catch (err) {
+    console.error("injectSendToMakeButton 오류:", err);
+  }
+};
