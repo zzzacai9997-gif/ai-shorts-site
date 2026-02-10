@@ -76,14 +76,14 @@ makeBtn.onclick = () => {
   }
 
   // ✅ 2) fetch fallback: headers 제거 (프리플라이트 최소화)
-  fetch(MAKE_WEBHOOK_URL, {
-    method: "POST",
-    mode: "no-cors",
-    body: JSON.stringify(payload)
-  });
+ fetch(MAKE_WEBHOOK_URL, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify(payload)
+});
 
-  uiStatus.textContent = "✅ 전송 요청 보냄 (fetch no-cors)";
-};
 
 
     try {
