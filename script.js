@@ -5,7 +5,7 @@
 ================================ */
 
 // ✅ 여기만 네 Make 웹훅으로 바꾸기
-const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/여기에_네_웹훅_주소";
+const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/np7g2x9566v8tqg4w383m2f3jdhik3or;
 
 // DOM
 const elTopic = document.getElementById("topicInput");
