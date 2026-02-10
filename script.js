@@ -222,7 +222,7 @@ function injectBatchUI() {
 
   // 주제 입력칸이 들어있는 카드 안에 넣기
   // (가장 가까운 .card 찾아서 아래에 삽입)
-  const card = topicInput.closest(".card") || document.body;
+ const card = topicInput.closest(".card") || document.body;
 
   const wrap = document.createElement("div");
   wrap.style.marginTop = "12px";
