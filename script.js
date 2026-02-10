@@ -346,6 +346,33 @@ function injectSendToMakeButton() {
 
   card.appendChild(btn);
 }
+// ---- Make로 보내기 버튼 추가 ----
+const btnMake = document.createElement("button");
+btnMake.id = "btnSendToMake";
+btnMake.textContent = "📤 Make로 보내서 자동화 시작";
+btnMake.style.marginTop = "10px";
+
+btnMake.addEventListener("click", async () => {
+  const topic = $("topic").value || "오늘의 이야기";
+  const category = $("category").value;
+  const tone = $("tone").value;
+
+  const payload = { topic, category, tone, created_at: new Date().toISOString() };
+
+  try {
+    const res = await fetch(MAKE_WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error("Webhook failed");
+    alert("✅ Make로 전송 완료! (이제 Make에서 받는지 확인)");
+  } catch (e) {
+    alert("❌ 전송 실패: MAKE_WEBHOOK_URL 확인해줘!");
+  }
+});
+
+card.appendChild(btnMake);
 
 function injectSendToMakeButton() {
   const topicInput = document.getElementById("topic");
