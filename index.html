@@ -1,173 +1,83 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI 쇼츠 · 롱폼 대본 생성기</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body {
-      margin: 0;
-      font-family: "Noto Sans KR", system-ui, sans-serif;
-      background: #0f1225;
-      color: #ffffff;
+    :root{
+      --bg:#0b1020;
+      --card:#1b2033;
+      --card2:#151a2b;
+      --text:#eaf0ff;
+      --muted:#a9b3d1;
+      --accent1:#7b7cff;
+      --accent2:#a855f7;
+      --white:#ffffff;
     }
-    .wrap {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 32px 20px;
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial, sans-serif;
+      background: radial-gradient(1200px 700px at 30% 10%, #171d35 0%, var(--bg) 60%);
+      color:var(--text);
     }
-    h1 {
-      margin-bottom: 6px;
+    .wrap{max-width:980px;margin:0 auto;padding:42px 18px 80px;}
+    .title{
+      display:flex;align-items:center;gap:12px;margin-bottom:8px;
+      font-size:34px;font-weight:800;letter-spacing:-0.02em;
     }
-    .desc {
-      opacity: 0.8;
-      margin-bottom: 24px;
+    .subtitle{color:var(--muted);margin-bottom:18px}
+    .card{
+      background: linear-gradient(180deg, var(--card) 0%, var(--card2) 100%);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:18px;
+      padding:18px;
+      box-shadow:0 10px 30px rgba(0,0,0,0.35);
     }
-    .card {
-      background: rgba(255,255,255,0.08);
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 20px;
+    .field{margin-bottom:14px}
+    label{display:block;margin-bottom:6px;color:var(--muted);font-weight:700}
+    input, select, textarea{
+      width:100%;
+      box-sizing:border-box;
+      padding:12px 14px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.10);
+      background:rgba(255,255,255,0.96);
+      color:#111827;
+      outline:none;
+      font-size:15px;
     }
-    label {
-      font-size: 13px;
-      opacity: 0.9;
+    textarea{min-height:200px;resize:vertical}
+    .btn{
+      width:100%;
+      padding:14px 12px;
+      border-radius:12px;
+      border:none;
+      cursor:pointer;
+      font-weight:800;
+      font-size:15px;
+      color:white;
+      background: linear-gradient(90deg, var(--accent1), var(--accent2));
+      margin-top:10px;
     }
-    input, select, textarea, button {
-      width: 100%;
-      margin-top: 6px;
-      margin-bottom: 16px;
-      padding: 12px;
-      border-radius: 12px;
-      border: none;
-      font-size: 14px;
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .btn.secondary{
+      background: linear-gradient(90deg, #6b7cff, #8b5cf6);
+      opacity:0.95;
     }
-    textarea {
-      min-height: 360px;
-      line-height: 1.6;
-    }
-    button {
-      background: linear-gradient(135deg, #6c7cff, #b26bff);
-      color: #fff;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    .footer {
-      font-size: 12px;
-      opacity: 0.6;
-      margin-top: 20px;
-      text-align: center;
-    }
+    .status{margin-top:10px;font-size:14px;color:var(--muted)}
+    .spacer{height:18px}
   </style>
 </head>
-
 <body>
   <div class="wrap">
-    <h1>🎬 AI 쇼츠 · 롱폼 대본 생성기</h1>
-    <div class="desc">
-      버튼 하나로 쇼츠 + 롱폼 + 30개 양산
-    </div>
+    <div class="title">🎬 AI 쇼츠 · 롱폼 대본 생성기</div>
+    <div class="subtitle">버튼 하나로 쇼츠 + 롱폼 + 30개 양산</div>
 
-    <div class="card">
-      <label>주제</label>
-      <input id="topic" placeholder="예: 지하철에서 멘탈 흔들릴 때 버티는 법" />
+    <div class="card" id="mainCard">
+      <div class="field">
+        <label for="topicInput">주제</label>
+        <input id="topicInput" placeholder="예: 지하철에서 멘탈 흔들릴 때 버티는 법" />
+      </div>
 
-      <label>카테고리</label>
-      <select id="category">
-        <option>힐링/감성</option>
-        <option>생활꿀팁</option>
-        <option>공포/괴담</option>
-        <option>연애/관계</option>
-        <option>자기계발</option>
-        <option>복지/지원금</option>
-      </select>
-
-      <label>말투</label>
-      <select id="tone">
-        <option>담백</option>
-        <option>다정</option>
-        <option>음습</option>
-        <option>빠름</option>
-        <option>단호</option>
-      </select>
-
-      <button onclick="makeScript()">대본 하나 만들기</button>
-
-      <button onclick="runFullPipeline()">
-        🚀 쇼츠 + 롱폼 + 30개 풀 생성
-      </button>
-    </div>
-
-    <div class="card">
-      <label>결과 대본</label>
-      <textarea id="result"></textarea>
-    </div>
-
-    <div class="footer">
-      © AI Shorts Automation
-    </div>
-  </div>
-
-<script>
-function makeScript() {
-  const topic = document.getElementById("topic").value || "오늘의 이야기";
-  const cat = document.getElementById("category").value;
-  const tone = document.getElementById("tone").value;
-
-  const script =
-`===== 쇼츠 =====
-[오프닝]
-${topic}… 이 얘기, 지금 꼭 해야 할 것 같았어요.
-
-[본문]
-괜찮은 척했지만,
-사실은 다 느끼고 있었어요.
-그래도 오늘을 버텼다는 것.
-
-[마무리]
-필요할 때, 다시 보세요.
-`;
-
-  document.getElementById("result").value = script;
-}
-
-function runFullPipeline() {
-  const topic = document.getElementById("topic").value || "오늘의 이야기";
-
-  let out = "";
-
-  out += "===== 쇼츠 =====\n";
-  out += "[오프닝]\n";
-  out += topic + "… 이 얘기, 지금 꼭 해야 할 것 같았어요.\n\n";
-  out += "[본문]\n";
-  out += "괜찮은 척했지만,\n";
-  out += "사실은 다 느끼고 있었어요.\n";
-  out += "그래도 오늘을 버텼다는 것.\n\n";
-  out += "[마무리]\n";
-  out += "이 영상, 필요할 때 다시 보세요.\n\n";
-
-  out += "===== 롱폼 =====\n";
-  out += "[도입]\n";
-  out += topic + "에 대해 요즘 자주 생각합니다.\n";
-  out += "이건 특별한 이야기가 아니라, 누구에게나 있는 순간이죠.\n\n";
-
-  out += "[본론]\n";
-  out += "우리는 비슷한 상황에서 같은 감정을 반복합니다.\n";
-  out += "그 감정을 외면하지 않는 게 중요해요.\n\n";
-
-  out += "[마무리]\n";
-  out += "다음 영상에서는 이 이야기를 조금 더 이어가볼게요.\n\n";
-
-  out += "===== 쇼츠 30개 =====\n";
-  for (let i = 1; i <= 30; i++) {
-    out += "\n--- " + i + " ---\n";
-    out += topic + "\n";
-    out += "괜찮은 척했지만, 다 느끼고 있었어요.\n";
-    out += "그래도 오늘을 버텼다는 것만으로 충분해요.\n";
-  }
-
-  document.getElementById("result").value = out;
-}
-</script>
-</body>
-</html>
+      <div class="fiel
