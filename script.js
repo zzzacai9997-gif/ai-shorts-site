@@ -1,4 +1,4 @@
-const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/np7g2x9566v8tqg4w383m2f3jdhik3or";
+const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/gnctl4nvovig2iil4gmt9r63fkx0896t";
 
 function ready(fn) {
   if (document.readyState === "loading") {
