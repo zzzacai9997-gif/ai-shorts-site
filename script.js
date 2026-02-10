@@ -1,4 +1,5 @@
-const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/np7g2x9566v8tqg4w383m2f3jdhik3or// =========================";
+const MAKE_WEBHOOK_URL =const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/np7g2x9566v8tqg4w383m2f3jdhik3or";
+
 // AI 쇼츠 · 롱폼 대본 생성기 (C: 주제 일괄 생성 자동화 포함)
 // - HTML 수정 없이: JS가 "주제 일괄 입력칸 + 버튼"을 자동 삽입
 // =========================
@@ -277,10 +278,10 @@ function injectSendToMakeButton() {
   const card = topicInput.closest(".card");
   if (!card) return;
 
-  if (document.getElementById("btnSendToMake")) return;
+  
 
   const btn = document.createElement("button");
-  btn.id = "btnSendToMake";
+
   btn.textContent = "📤 Make로 보내서 자동 영상 만들기";
   btn.style.marginTop = "10px";
 
@@ -318,7 +319,7 @@ function injectSendToMakeButton() {
   if (document.getElementById("btnSendToMake")) return;
 
   const btn = document.createElement("button");
-  btn.id = "btnSendToMake";
+ 
   btn.textContent = "📤 Make로 보내서 자동 영상 만들기";
   btn.style.marginTop = "10px";
 
@@ -348,7 +349,7 @@ function injectSendToMakeButton() {
 }
 // ---- Make로 보내기 버튼 추가 ----
 const btnMake = document.createElement("button");
-btnMake.id = "btnSendToMake";
+
 btnMake.textContent = "📤 Make로 보내서 자동화 시작";
 btnMake.style.marginTop = "10px";
 
@@ -380,7 +381,7 @@ function injectSendToMakeButton() {
   const card = topicInput.closest(".card");
   if (!card) return;
 
-  if (document.getElementById("btnSendToMake")) return;
+
 
   const btn = document.createElement("button");
   btn.id = "btnSendToMake";
