@@ -452,3 +452,4 @@ function injectSendToMakeButton() {
 }
 
 document.addEventListener("DOMContentLoaded", injectSendToMakeButton);
+setTimeout(injectSendToMakeButton, 1000);
