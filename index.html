@@ -1,83 +1,100 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AI 쇼츠 · 롱폼 대본 생성기</title>
   <style>
-    :root{
-      --bg:#0b1020;
-      --card:#1b2033;
-      --card2:#151a2b;
-      --text:#eaf0ff;
-      --muted:#a9b3d1;
-      --accent1:#7b7cff;
-      --accent2:#a855f7;
-      --white:#ffffff;
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", sans-serif;
+      background: #0b1020;
+      color: #eaf0ff;
     }
-    body{
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial, sans-serif;
-      background: radial-gradient(1200px 700px at 30% 10%, #171d35 0%, var(--bg) 60%);
-      color:var(--text);
+    .wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 16px;
     }
-    .wrap{max-width:980px;margin:0 auto;padding:42px 18px 80px;}
-    .title{
-      display:flex;align-items:center;gap:12px;margin-bottom:8px;
-      font-size:34px;font-weight:800;letter-spacing:-0.02em;
+    h1 { margin-bottom: 6px; }
+    .card {
+      background: #1b2033;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
     }
-    .subtitle{color:var(--muted);margin-bottom:18px}
-    .card{
-      background: linear-gradient(180deg, var(--card) 0%, var(--card2) 100%);
-      border:1px solid rgba(255,255,255,0.08);
-      border-radius:18px;
-      padding:18px;
-      box-shadow:0 10px 30px rgba(0,0,0,0.35);
+    label {
+      display: block;
+      margin-bottom: 6px;
+      opacity: .8;
     }
-    .field{margin-bottom:14px}
-    label{display:block;margin-bottom:6px;color:var(--muted);font-weight:700}
-    input, select, textarea{
-      width:100%;
-      box-sizing:border-box;
-      padding:12px 14px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,0.10);
-      background:rgba(255,255,255,0.96);
-      color:#111827;
-      outline:none;
-      font-size:15px;
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      margin-bottom: 14px;
+      font-size: 15px;
     }
-    textarea{min-height:200px;resize:vertical}
-    .btn{
-      width:100%;
-      padding:14px 12px;
-      border-radius:12px;
-      border:none;
-      cursor:pointer;
-      font-weight:800;
-      font-size:15px;
-      color:white;
-      background: linear-gradient(90deg, var(--accent1), var(--accent2));
-      margin-top:10px;
+    textarea { min-height: 200px; }
+    button {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      color: white;
+      background: linear-gradient(90deg,#7b7cff,#a855f7);
+      margin-bottom: 10px;
     }
-    .btn:disabled{opacity:.6;cursor:not-allowed}
-    .btn.secondary{
-      background: linear-gradient(90deg, #6b7cff, #8b5cf6);
-      opacity:0.95;
+    .status {
+      font-size: 14px;
+      opacity: .85;
     }
-    .status{margin-top:10px;font-size:14px;color:var(--muted)}
-    .spacer{height:18px}
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="title">🎬 AI 쇼츠 · 롱폼 대본 생성기</div>
-    <div class="subtitle">버튼 하나로 쇼츠 + 롱폼 + 30개 양산</div>
+    <h1>🎬 AI 쇼츠 · 롱폼 대본 생성기</h1>
+    <p>버튼 하나로 쇼츠 + 롱폼 + 30개 양산</p>
 
-    <div class="card" id="mainCard">
-      <div class="field">
-        <label for="topicInput">주제</label>
-        <input id="topicInput" placeholder="예: 지하철에서 멘탈 흔들릴 때 버티는 법" />
-      </div>
+    <div class="card">
+      <label>주제</label>
+      <input id="topicInput" placeholder="예: 지하철에서 멘탈 흔들릴 때 버티는 법"/>
 
-      <div class="fiel
+      <label>카테고리</label>
+      <select id="categorySelect">
+        <option>힐링/감성</option>
+        <option>생활꿀팁</option>
+        <option>공포</option>
+        <option>동기부여</option>
+      </select>
+
+      <label>말투</label>
+      <select id="toneSelect">
+        <option>담백</option>
+        <option>따뜻</option>
+        <option>유머</option>
+        <option>음습체</option>
+      </select>
+
+      <button id="btnOne">대본 하나 만들기</button>
+      <button id="btnBatch">🚀 30개 풀 생성</button>
+
+      <!-- Make 버튼 여기 -->
+      <div id="makeArea"></div>
+      <div class="status" id="uiStatus"></div>
+    </div>
+
+    <div class="card">
+      <label>결과 대본</label>
+      <textarea id="resultArea"></textarea>
+      <div class="status" id="genStatus"></div>
+    </div>
+  </div>
+
+  <script src="./script.js"></script>
+</body>
+</html>
