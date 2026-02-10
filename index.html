@@ -1,71 +1,134 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>AI Shorts Automation Lab</title>
-  <link rel="stylesheet" href="./style.css" />
+  <meta charset="utf-8" />
+  <title>AI 쇼츠 대본 생성기</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      margin: 0;
+      font-family: "Noto Sans KR", system-ui, sans-serif;
+      background: #0f1225;
+      color: #ffffff;
+    }
+    .wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+    h1 {
+      margin-bottom: 8px;
+    }
+    .desc {
+      opacity: 0.8;
+      margin-bottom: 24px;
+    }
+    .card {
+      background: rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    label {
+      font-size: 13px;
+      opacity: 0.9;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      margin-top: 6px;
+      margin-bottom: 16px;
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      font-size: 14px;
+    }
+    textarea {
+      min-height: 260px;
+      line-height: 1.5;
+    }
+    button {
+      background: linear-gradient(135deg, #6c7cff, #b26bff);
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .footer {
+      font-size: 12px;
+      opacity: 0.6;
+      margin-top: 20px;
+      text-align: center;
+    }
+  </style>
 </head>
+
 <body>
   <div class="wrap">
-    <header class="header">
-      <h1>AI 쇼츠 생성기</h1>
-      <p class="sub">주제 입력 → 대본 생성 → n8n 자동화 호출</p>
-      <div class="status" id="status">대기 중</div>
-    </header>
+    <h1>🎬 AI 쇼츠 대본 생성기</h1>
+    <div class="desc">
+      API 없이 · 무료 · 버튼 하나로 쇼츠 대본 자동 생성
+    </div>
 
-    <main class="grid">
-      <section class="card">
-        <h2>1) 입력</h2>
-        <label class="label">주제</label>
-        <input id="topic" class="input" placeholder="예: 지하철에서 절대 하면 안 되는 3가지" />
+    <div class="card">
+      <label>주제</label>
+      <input id="topic" placeholder="예: 지하철에서 멘탈 흔들릴 때 버티는 법" />
 
-        <label class="label">톤/분위기</label>
-        <select id="tone" class="input">
-          <option value="힐링">힐링</option>
-          <option value="공감">공감</option>
-          <option value="웃김">웃김</option>
-          <option value="공포">공포</option>
-        </select>
+      <label>카테고리</label>
+      <select id="category">
+        <option>힐링/감성</option>
+        <option>생활꿀팁</option>
+        <option>공포/괴담</option>
+        <option>연애/관계</option>
+        <option>자기계발</option>
+        <option>복지/지원금</option>
+      </select>
 
-        <label class="label">언어</label>
-        <select id="lang" class="input">
-          <option value="ko">한국어</option>
-          <option value="es">스페인어</option>
-        </select>
+      <label>말투</label>
+      <select id="tone">
+        <option>담백</option>
+        <option>다정</option>
+        <option>음습</option>
+        <option>빠름</option>
+        <option>단호</option>
+      </select>
 
-        <div class="row">
-          <button id="btnGenerate" class="btn primary">대본 생성 + n8n 호출</button>
-          <button id="btnClear" class="btn">지우기</button>
-        </div>
+      <button onclick="makeScript()">대본 만들기</button>
+    </div>
 
-        <p class="hint">
-          ⚠️ 버튼이 n8n Webhook으로 POST 요청을 보냅니다. (아래 WEBHOOK_URL만 바꾸면 됨)
-        </p>
-      </section>
+    <div class="card">
+      <label>결과 대본</label>
+      <textarea id="result"></textarea>
+    </div>
 
-      <section class="card">
-        <h2>2) 결과</h2>
-        <label class="label">응답(JSON)</label>
-        <pre id="result" class="result">{}</pre>
-
-        <label class="label">대본(있으면 자동 표시)</label>
-        <textarea id="script" class="textarea" placeholder="n8n 응답에 script가 있으면 여기 자동으로 들어와요."></textarea>
-
-        <div class="row">
-          <button id="btnCopy" class="btn">대본 복사</button>
-          <a class="btn link" id="openN8N" href="#" target="_blank" rel="noreferrer">n8n 링크 열기</a>
-        </div>
-      </section>
-    </main>
-
-    <footer class="footer">
-      <span>GitHub Pages</span>
-      <span class="dot">•</span>
-      <span>n8n Webhook 연동</span>
-    </footer>
+    <div class="footer">
+      © AI Shorts Automation · GitHub Pages
+    </div>
   </div>
 
-  <script src="./script.js"></script>
+<script>
+function makeScript() {
+  const topic = document.getElementById("topic").value || "오늘의 이야기";
+  const cat = document.getElementById("category").value;
+  const tone = document.getElementById("tone").value;
+
+  const script =
+`[오프닝]
+${topic}… 이 얘기, 지금 꼭 해야 할 것 같았어요.
+
+[본문]
+많은 사람들이 ${cat} 때문에 흔들립니다.
+하지만 핵심은 하나예요.
+지금 이 순간, 내가 뭘 느끼는지 아는 것.
+
+조금만 멈추고,
+조금만 숨을 고르고,
+이 말 한 번만 기억하세요.
+
+[마무리]
+이 영상이 도움이 됐다면 저장해두세요.
+${tone} 톤으로, 다음 이야기에서 다시 만나요.`;
+
+  document.getElementById("result").value = script;
+}
+</script>
 </body>
 </html>
