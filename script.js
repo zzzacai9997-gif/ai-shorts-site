@@ -1,5 +1,8 @@
 // ✅ 네 Make 웹훅 주소만 여기 넣기
 const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/np7g2x9566v8tqg4w383m2f3jdhik3or";
+alert("🔥 script.js 진짜 실행됨");
+
+
 
 // ===============================
 // 0) 안전하게 DOM 준비 후 실행
