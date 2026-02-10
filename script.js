@@ -82,4 +82,119 @@ const CTA = {
   ],
   "빠름": [
     "오케이, 저장하고 바로 써먹자!",
-    "끝! 댓글로
+    "끝! 댓글로 다음 주제 던져줘!",
+    "저장해두고 내일 바로 써봐!"
+  ],
+  "단호": [
+    "결론: 지금 확인하고 처리하세요. 미루면 손해입니다.",
+    "핵심만 기억하세요. 확인→신청→증빙. 끝.",
+    "지금 바로 체크하고, 기간 놓치지 마세요."
+  ]
+};
+
+// ---- 카테고리별 본문 포인트(3포인트 구조) ----
+const POINTS = {
+  "힐링/감성": ["숨을 한 번 길게", "오늘 나를 탓하지 않기", "딱 한 가지를 내려놓기", "10분만 쉬기", "따뜻한 물 한 컵"],
+  "생활꿀팁": ["라벨링으로 정리", "타이머 5분 청소", "자주 쓰는 건 한 곳에", "중복 구매 리스트", "습관화 체크"],
+  "공포/괴담": ["복도 센서등", "엘리베이터 거울", "문틈 바람", "새벽 발소리", "창문 두드림"],
+  "연애/관계": ["기대치 조절", "경계선 세우기", "확인 질문", "말투 다듬기", "내 시간 지키기"],
+  "자기계발": ["하루 10분", "기록", "환경 세팅", "작은 보상", "루틴 고정"],
+  "복지/지원금": ["지자체 홈페이지", "주민센터 문의", "자격 조건 확인", "신청 기간", "사기 링크 차단"]
+};
+
+// ---- 쇼츠 1편 만들기 (한 줄=한 컷) ----
+function buildShort(topic, category, tone) {
+  const hook = pick(HOOKS[category] || HOOKS["힐링/감성"]);
+  const pts = shuffle(POINTS[category] || POINTS["힐링/감성"]).slice(0, 3);
+  const cta = pick(CTA[tone] || CTA["담백"]);
+
+  return [
+    "[오프닝]",
+    hook,
+    "",
+    "[본문]",
+    `오늘은 딱 3가지만 기억해.`,
+    `1) ${pts[0]}`,
+    `2) ${pts[1]}`,
+    `3) ${pts[2]}`,
+    "",
+    "[마무리]",
+    cta
+  ].join("\n");
+}
+
+// ---- 롱폼 1편 만들기 (5~10분 구조) ----
+function buildLong(topic, category, tone) {
+  const hook = pick(HOOKS[category] || HOOKS["힐링/감성"]);
+  const pts = shuffle(POINTS[category] || POINTS["힐링/감성"]).slice(0, 5);
+  const cta = pick(CTA[tone] || CTA["담백"]);
+
+  return [
+    "[도입]",
+    `${hook}`,
+    `${topic} 이 주제로, 오늘은 조금 길게 이야기해볼게요.`,
+    "",
+    "[본론 1: 왜 이게 문제처럼 느껴질까]",
+    `우리는 보통 ${category} 상황에서 마음이 먼저 흔들려요.`,
+    `그때 제일 먼저 하는 실수는, 내 감정을 ‘별거 아닌 것’처럼 넘기는 거예요.`,
+    "",
+    "[본론 2: 실제로 해볼 3가지]",
+    `첫째, ${pts[0]}.`,
+    `둘째, ${pts[1]}.`,
+    `셋째, ${pts[2]}.`,
+    "",
+    "[본론 3: 시청자 질문]",
+    "여러분은 요즘 어떤 순간에 가장 흔들리나요?",
+    "그 순간, 스스로에게 어떤 말을 해주고 있나요?",
+    "오늘 한 가지만 바꿀 수 있다면, 뭘 바꾸고 싶나요?",
+    "",
+    "[마무리]",
+    `정답은 없지만, 한 가지는 분명해요. ‘지금의 나’를 무시하지 않는 것.`,
+    cta,
+    "다음 영상에서는 이 주제의 ‘반대편 이야기’도 이어갈게요."
+  ].join("\n");
+}
+
+// ---- 쇼츠 30개 양산 (표현 다양화) ----
+function buildShortBatch(topic, category, tone, n = 30) {
+  let out = "===== 쇼츠 30개 =====\n";
+  for (let i = 1; i <= n; i++) {
+    out += `\n--- ${i} ---\n`;
+    out += buildShort(topic, category, tone) + "\n";
+  }
+  return out.trim();
+}
+
+// =============
+// 버튼 연결 함수들
+// =============
+window.makeScript = function () {
+  const topic = $("topic").value || "오늘의 이야기";
+  const category = $("category").value;
+  const tone = $("tone").value;
+
+  const one = [
+    "===== 쇼츠 =====",
+    buildShort(topic, category, tone)
+  ].join("\n\n");
+
+  $("result").value = one;
+};
+
+window.runFullPipeline = function () {
+  const topic = $("topic").value || "오늘의 이야기";
+  const category = $("category").value;
+  const tone = $("tone").value;
+
+  const full = [
+    "===== 쇼츠 =====",
+    buildShort(topic, category, tone),
+    "",
+    "===== 롱폼 =====",
+    buildLong(topic, category, tone),
+    "",
+    buildShortBatch(topic, category, tone, 30)
+  ].join("\n");
+
+  $("result").value = full;
+};
