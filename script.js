@@ -1,183 +1,220 @@
-const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/gnctl4nvovig2iil4gmt9r63fkx0896t";
+// ===============================
+// ✅ 설정: 너의 Make(또는 n8n) Webhook URL 넣는 곳
+// ===============================
+// 예) "https://hook.eu1.make.com/xxxxx"
+// 주의: URL은 반드시 https:// 로 시작해야 함
+const WEBHOOK_URL = "https://hook.eu1.make.com/np7g2x9566v8tqg4w383m2f3jdhik3or";
 
-function ready(fn) {
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", fn);
-  } else fn();
-}
+// ===============================
+// 공통 유틸: 안전하게 응답 텍스트/JSON 처리
+// ===============================
+async function parseResponseAsTextOrJson(res) {
+  const text = await res.text(); // 무조건 text로 먼저 받기
+  console.log("RAW RESPONSE:", text);
 
-ready(() => {
-  const topic = document.getElementById("topicInput");
-  const category = document.getElementById("categorySelect");
-  const tone = document.getElementById("toneSelect");
-  const result = document.getElementById("resultArea");
-  const btnOne = document.getElementById("btnOne");
-  const btnBatch = document.getElementById("btnBatch");
-  const makeArea = document.getElementById("makeArea");
-  const uiStatus = document.getElementById("uiStatus");
-  const genStatus = document.getElementById("genStatus");
-
-  // ✅ Make 버튼 만들기 (항상 보이게)
-  makeArea.innerHTML = "";
-  const makeBtn = document.createElement("button");
-  makeBtn.textContent = "Make로 보내기";
-  makeArea.appendChild(makeBtn);
-
-  // ✅ 대본 하나 만들기
-  btnOne.onclick = () => {
-    const t = (topic.value || "").trim();
-    if (!t) { genStatus.textContent = "❌ 주제를 입력하세요."; return; }
-    result.value =
-      `오늘의 주제: ${t}\n` +
-      `카테고리: ${category.value}\n` +
-      `말투: ${tone.value}\n\n` +
-      `(테스트 대본)\n- 훅 1문장\n- 핵심 3포인트\n- 마무리 1문장`;
-    genStatus.textContent = "✅ 생성 완료";
-  };
-
-  // ✅ 30개 생성
-  btnBatch.onclick = () => {
-    const t = (topic.value || "").trim();
-    if (!t) { genStatus.textContent = "❌ 주제를 입력하세요."; return; }
-    let out = "";
-    for (let i = 1; i <= 30; i++) {
-      out += `===== #${String(i).padStart(2, "0")} =====\n`;
-      out += `주제: ${t}\n카테고리: ${category.value}\n말투: ${tone.value}\n`;
-      out += `대본: ${t} (${i}번째)\n\n`;
-    }
-    result.value = out;
-    genStatus.textContent = "✅ 30개 생성 완료";
-  };
-
-  // ✅ Make로 보내기 (sendBeacon 우선)
-makeBtn.onclick = () => {
-  const t = (topic.value || "").trim();
-  if (!t) { uiStatus.textContent = "❌ 주제를 입력하세요."; return; }
-
-  const payload = {
-    topic: t,
-    category: category.value,
-    tone: tone.value,
-    script: result.value || "",
-    sentAt: new Date().toISOString()
-  };
-
-  uiStatus.textContent = "⏳ Make로 전송중…";
-
-  try {
-    // ✅ 1) sendBeacon (가장 안정적)
-    const ok = navigator.sendBeacon(MAKE_WEBHOOK_URL, JSON.stringify(payload));
-    if (ok) {
-      uiStatus.textContent = "✅ 전송 요청 보냄 (beacon)";
-      return;
-    }
-  } catch (e) {
-    // 무시하고 fetch로 fallback
+  // 비어있는 응답 방지
+  if (!text || !text.trim()) {
+    return { ok: res.ok, status: res.status, raw: "", data: null };
   }
 
-  // ✅ 2) fetch fallback: headers 제거 (프리플라이트 최소화)
- document.getElementById("generateOneBtn").addEventListener("click", async () => {
-  const topic = document.getElementById("topic").value;
+  // JSON이면 파싱
+  let data = null;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    data = null;
+  }
+
+  return { ok: res.ok, status: res.status, raw: text, data };
+}
+
+function pickBestOutput(parsed) {
+  const { data, raw } = parsed;
+
+  // 서버가 JSON으로 주는 경우 흔한 키들 우선순위
+  const out =
+    data?.result ??
+    data?.text ??
+    data?.output ??
+    data?.message ??
+    data?.data ??
+    raw;
+
+  // 객체면 보기 좋게
+  if (typeof out === "object") {
+    try {
+      return JSON.stringify(out, null, 2);
+    } catch {
+      return String(out);
+    }
+  }
+  return String(out ?? "");
+}
+
+function getInputs() {
+  const topic = document.getElementById("topic")?.value?.trim() || "";
+  const category = document.getElementById("category")?.value || "";
+  const tone = document.getElementById("tone")?.value || "";
+
+  return { topic, category, tone };
+}
+
+function setResult(msg) {
   const resultBox = document.getElementById("result");
+  if (resultBox) resultBox.value = msg;
+}
+
+function appendResult(msg) {
+  const resultBox = document.getElementById("result");
+  if (!resultBox) return;
+  if (!resultBox.value) resultBox.value = msg;
+  else resultBox.value += "\n\n" + msg;
+}
+
+function setBusy(isBusy) {
+  const oneBtn = document.getElementById("generateOneBtn");
+  const batchBtn = document.getElementById("generateBatchBtn");
+
+  if (oneBtn) oneBtn.disabled = isBusy;
+  if (batchBtn) batchBtn.disabled = isBusy;
+}
+
+// ===============================
+// ✅ 1개 생성
+// ===============================
+async function generateOne() {
+  if (!WEBHOOK_URL || WEBHOOK_URL.includes("여기에_너의_WEBHOOK_URL")) {
+    setResult("❌ WEBHOOK_URL을 먼저 넣어줘! (script.js 상단)");
+    return;
+  }
+
+  const { topic, category, tone } = getInputs();
+
+  if (!topic) {
+    setResult("❌ 주제를 입력해줘.");
+    return;
+  }
+
+  setBusy(true);
+  setResult("⏳ 생성 중...");
 
   try {
     const res = await fetch(WEBHOOK_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ topic })
+      headers: {
+        "Content-Type": "application/json",
+      },
+      // Make/n8n 쪽에서 받기 쉬운 형태
+      body: JSON.stringify({ topic, category, tone, count: 1 }),
     });
 
-    const text = await res.text();   // 🔴 여기 중요
-    console.log("RAW:", text);
+    const parsed = await parseResponseAsTextOrJson(res);
 
-    let data;
-    try { data = JSON.parse(text); } catch { data = null; }
-
-    resultBox.value =
-      data?.result ??
-      data?.text ??
-      data?.output ??
-      text;
-
-  } catch (e) {
-    resultBox.value = "❌ 요청 실패: " + (e?.message || e);
-  }
-});
-
-
-
-
-    try {
-      // ✅ CORS 안정 옵션
-      const res = await fetch(MAKE_WEBHOOK_URL, {
-        method: "POST",
-        mode: "cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-
-      // 만약 여기서 막히면 no-cors로 바꾸면 됨(아래 참고)
-      if (!res.ok) throw new Error("HTTP " + res.status);
-
-      uiStatus.textContent = "✅ Make 전송 완료!";
-    } catch (e) {
-      console.error(e);
-
-      // 🔥 최후의 확실한 전송(no-cors) — Make는 보통 수신됨
-      try {
-        await fetch(MAKE_WEBHOOK_URL, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-        uiStatus.textContent = "✅ 전송 요청 보냄 (no-cors)";
-      } catch (e2) {
-        console.error(e2);
-        uiStatus.textContent = "❌ 전송 실패 (네트워크/URL 확인)";
-      }
+    // HTTP 에러면 상태/원문 같이 보여주기
+    if (!parsed.ok) {
+      setResult(
+        `❌ 요청 실패 (HTTP ${parsed.status})\n\n${pickBestOutput(parsed)}`
+      );
+      return;
     }
-  };
-});
-// ===============================
-// Make로 보내기 버튼 (핵심)
-// ===============================
-ready(() => {
-  const btnMake = document.getElementById("btnMake");
 
-  if (!btnMake) {
-    console.error("❌ btnMake 버튼 못 찾음");
+    const out = pickBestOutput(parsed).trim();
+    setResult(out || "❌ 응답은 왔지만 내용이 비어 있음");
+  } catch (e) {
+    console.error(e);
+    setResult("❌ 요청 실패: " + (e?.message || e));
+  } finally {
+    setBusy(false);
+  }
+}
+
+// ===============================
+// ✅ 30개 생성 (한 번에 받거나, 여러 번 호출 둘 다 지원)
+// - 서버가 한 번에 30개를 주면 그대로 출력
+// - 서버가 1개만 주는 구조면, 30번 반복 호출하는 모드로도 가능(옵션)
+// ===============================
+
+// 🔁 옵션: 서버가 "한 번에 30개" 지원하면 false 그대로 두기
+// 서버가 1개만 주면 true로 바꿔서 30번 반복 호출
+const BATCH_AS_MULTI_CALLS = false;
+
+// 30개 구분선
+const SEP = "\n\n===== 구분선 =====\n\n";
+
+async function generateBatch30() {
+  if (!WEBHOOK_URL || WEBHOOK_URL.includes("여기에_너의_WEBHOOK_URL")) {
+    setResult("❌ WEBHOOK_URL을 먼저 넣어줘! (script.js 상단)");
     return;
   }
 
-  btnMake.addEventListener("click", async () => {
-    console.log("🚀 Make로 보내기 클릭됨");
+  const { topic, category, tone } = getInputs();
 
-    const payload = {
-      topic: topic.value,
-      category: category.value,
-      tone: tone.value,
-      result: result.value,
-      createdAt: new Date().toISOString()
-    };
+  if (!topic) {
+    setResult("❌ 주제를 입력해줘.");
+    return;
+  }
 
-    console.log("📦 전송 데이터:", payload);
+  setBusy(true);
+  setResult("⏳ 30개 생성 중...");
 
-    try {
-      await fetch(MAKE_WEBHOOK_URL, {
+  try {
+    if (!BATCH_AS_MULTI_CALLS) {
+      // ✅ 1번 호출로 30개 받는 방식
+      const res = await fetch(WEBHOOK_URL, {
         method: "POST",
-        mode: "no-cors", // Make 웹훅 필수
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ topic, category, tone, count: 30 }),
       });
 
-      uiStatus.innerText = "✅ Make로 전송 완료";
-      console.log("✅ Make 전송 성공");
-    } catch (err) {
-      console.error("❌ Make 전송 실패", err);
-      uiStatus.innerText = "❌ Make 전송 실패";
+      const parsed = await parseResponseAsTextOrJson(res);
+
+      if (!parsed.ok) {
+        setResult(
+          `❌ 요청 실패 (HTTP ${parsed.status})\n\n${pickBestOutput(parsed)}`
+        );
+        return;
+      }
+
+      const out = pickBestOutput(parsed).trim();
+      setResult(out || "❌ 응답은 왔지만 내용이 비어 있음");
+    } else {
+      // ✅ 30번 반복 호출 방식
+      setResult(""); // 결과창 비우고 누적
+      for (let i = 0; i < 30; i++) {
+        appendResult(`⏳ (${i + 1}/30) 생성 중...`);
+        const res = await fetch(WEBHOOK_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ topic, category, tone, count: 1 }),
+        });
+
+        const parsed = await parseResponseAsTextOrJson(res);
+        if (!parsed.ok) {
+          appendResult(
+            `❌ (${i + 1}/30) 실패 (HTTP ${parsed.status})\n${pickBestOutput(parsed)}`
+          );
+          continue;
+        }
+
+        const out = pickBestOutput(parsed).trim();
+        appendResult(out || "❌ 비어있는 응답");
+        if (i !== 29) appendResult("===== 구분선 =====");
+      }
     }
-  });
-});
+  } catch (e) {
+    console.error(e);
+    setResult("❌ 요청 실패: " + (e?.message || e));
+  } finally {
+    setBusy(false);
+  }
+}
+
+// ===============================
+// ✅ 버튼 연결 (HTML id가 있어야 함)
+// - generateOneBtn
+// - generateBatchBtn
+// ===============================
+document.getElementById("generateOneBtn")?.addEventListener("click", generateOne);
+document
+  .getElementById("generateBatchBtn")
+  ?.addEventListener("click", generateBatch30);
