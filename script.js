@@ -271,6 +271,118 @@ function injectBatchUI() {
     URL.revokeObjectURL(a.href);
   });
 }
+function injectSendToMakeButton() {
+  const topicInput = document.getElementById("topic");
+  if (!topicInput) return;
+  const card = topicInput.closest(".card");
+  if (!card) return;
 
-// DOM 로드 후 UI 삽입
-document.addEventListener("DOMContentLoaded", injectBatchUI);
+  if (document.getElementById("btnSendToMake")) return;
+
+  const btn = document.createElement("button");
+  btn.id = "btnSendToMake";
+  btn.textContent = "📤 Make로 보내서 자동 영상 만들기";
+  btn.style.marginTop = "10px";
+
+  btn.addEventListener("click", async () => {
+    const topic = document.getElementById("topic").value || "오늘의 이야기";
+    const category = document.getElementById("category").value;
+    const tone = document.getElementById("tone").value;
+
+    // 네 사이트가 이미 만들어주는 결과를 Make로 보낼 payload
+    // (풀 생성 로직을 쓰고 싶으면 runFullPipeline() 먼저 실행해도 됨)
+    const payload = { topic, category, tone, created_at: new Date().toISOString() };
+
+    try {
+      const res = await fetch(MAKE_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error("Webhook failed");
+      alert("✅ Make로 전송 완료! (자동 영상 생성 시작)");
+    } catch (e) {
+      alert("❌ 전송 실패: Make 웹훅 URL 확인해줘!");
+    }
+  });
+
+  card.appendChild(btn);
+}
+
+function injectSendToMakeButton() {
+  const topicInput = document.getElementById("topic");
+  if (!topicInput) return;
+  const card = topicInput.closest(".card");
+  if (!card) return;
+
+  if (document.getElementById("btnSendToMake")) return;
+
+  const btn = document.createElement("button");
+  btn.id = "btnSendToMake";
+  btn.textContent = "📤 Make로 보내서 자동 영상 만들기";
+  btn.style.marginTop = "10px";
+
+  btn.addEventListener("click", async () => {
+    const topic = document.getElementById("topic").value || "오늘의 이야기";
+    const category = document.getElementById("category").value;
+    const tone = document.getElementById("tone").value;
+
+    // 네 사이트가 이미 만들어주는 결과를 Make로 보낼 payload
+    // (풀 생성 로직을 쓰고 싶으면 runFullPipeline() 먼저 실행해도 됨)
+    const payload = { topic, category, tone, created_at: new Date().toISOString() };
+
+    try {
+      const res = await fetch(MAKE_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error("Webhook failed");
+      alert("✅ Make로 전송 완료! (자동 영상 생성 시작)");
+    } catch (e) {
+      alert("❌ 전송 실패: Make 웹훅 URL 확인해줘!");
+    }
+  });
+
+  card.appendChild(btn);
+}
+
+function injectSendToMakeButton() {
+  const topicInput = document.getElementById("topic");
+  if (!topicInput) return;
+  const card = topicInput.closest(".card");
+  if (!card) return;
+
+  if (document.getElementById("btnSendToMake")) return;
+
+  const btn = document.createElement("button");
+  btn.id = "btnSendToMake";
+  btn.textContent = "📤 Make로 보내서 자동 영상 만들기";
+  btn.style.marginTop = "10px";
+
+  btn.addEventListener("click", async () => {
+    const topic = document.getElementById("topic").value || "오늘의 이야기";
+    const category = document.getElementById("category").value;
+    const tone = document.getElementById("tone").value;
+
+    // 네 사이트가 이미 만들어주는 결과를 Make로 보낼 payload
+    // (풀 생성 로직을 쓰고 싶으면 runFullPipeline() 먼저 실행해도 됨)
+    const payload = { topic, category, tone, created_at: new Date().toISOString() };
+
+    try {
+      const res = await fetch(MAKE_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error("Webhook failed");
+      alert("✅ Make로 전송 완료! (자동 영상 생성 시작)");
+    } catch (e) {
+      alert("❌ 전송 실패: Make 웹훅 URL 확인해줘!");
+    }
+  });
+
+  card.appendChild(btn);
+}
+
+document.addEventListener("DOMContentLoaded", injectSendToMakeButton);
