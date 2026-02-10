@@ -76,13 +76,34 @@ makeBtn.onclick = () => {
   }
 
   // ✅ 2) fetch fallback: headers 제거 (프리플라이트 최소화)
- fetch(MAKE_WEBHOOK_URL, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify(payload)
+ document.getElementById("generateOneBtn").addEventListener("click", async () => {
+  const topic = document.getElementById("topic").value;
+  const resultBox = document.getElementById("result");
+
+  try {
+    const res = await fetch(WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ topic })
+    });
+
+    const text = await res.text();   // 🔴 여기 중요
+    console.log("RAW:", text);
+
+    let data;
+    try { data = JSON.parse(text); } catch { data = null; }
+
+    resultBox.value =
+      data?.result ??
+      data?.text ??
+      data?.output ??
+      text;
+
+  } catch (e) {
+    resultBox.value = "❌ 요청 실패: " + (e?.message || e);
+  }
 });
+
 
 
 
