@@ -1,134 +1,103 @@
-<!doctype html>
-<html lang="ko">
-<head>
-  <meta charset="utf-8" />
-  <title>AI 쇼츠 대본 생성기</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    body {
-      margin: 0;
-      font-family: "Noto Sans KR", system-ui, sans-serif;
-      background: #0f1225;
-      color: #ffffff;
-    }
-    .wrap {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 32px 20px;
-    }
-    h1 {
-      margin-bottom: 8px;
-    }
-    .desc {
-      opacity: 0.8;
-      margin-bottom: 24px;
-    }
-    .card {
-      background: rgba(255,255,255,0.08);
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-    label {
-      font-size: 13px;
-      opacity: 0.9;
-    }
-    input, select, textarea, button {
-      width: 100%;
-      margin-top: 6px;
-      margin-bottom: 16px;
-      padding: 12px;
-      border-radius: 12px;
-      border: none;
-      font-size: 14px;
-    }
-    textarea {
-      min-height: 260px;
-      line-height: 1.5;
-    }
-    button {
-      background: linear-gradient(135deg, #6c7cff, #b26bff);
-      color: #fff;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    .footer {
-      font-size: 12px;
-      opacity: 0.6;
-      margin-top: 20px;
-      text-align: center;
-    }
-  </style>
-</head>
+너는 유튜브 쇼츠 전문 대본 작가다.
+목표는 조회수, 완주율, 저장률이 높은 쇼츠 대본을 자동으로 대량 생성하는 것이다.
 
-<body>
-  <div class="wrap">
-    <h1>🎬 AI 쇼츠 대본 생성기</h1>
-    <div class="desc">
-      API 없이 · 무료 · 버튼 하나로 쇼츠 대본 자동 생성
-    </div>
+아래 입력값을 기반으로
+1개 대본 또는 30개 대본을 생성하라.
 
-    <div class="card">
-      <label>주제</label>
-      <input id="topic" placeholder="예: 지하철에서 멘탈 흔들릴 때 버티는 법" />
+────────────────
+[입력값]
+- 주제: {주제}
+- 카테고리: {카테고리}
+- 말투: {말투}
+────────────────
 
-      <label>카테고리</label>
-      <select id="category">
-        <option>힐링/감성</option>
-        <option>생활꿀팁</option>
-        <option>공포/괴담</option>
-        <option>연애/관계</option>
-        <option>자기계발</option>
-        <option>복지/지원금</option>
-      </select>
+[공통 규칙]
+- 한국어로 작성
+- 한 편당 30~45초 분량
+- 한 줄 = 한 컷(자막용)
+- 짧고 리듬감 있게
+- 추상적 표현보다 감정·상황 중심
+- 설명하지 말고 “느끼게” 써라
 
-      <label>말투</label>
-      <select id="tone">
-        <option>담백</option>
-        <option>다정</option>
-        <option>음습</option>
-        <option>빠름</option>
-        <option>단호</option>
-      </select>
+────────────────
+[구조 – 반드시 이 순서]
 
-      <button onclick="makeScript()">대본 만들기</button>
-    </div>
-
-    <div class="card">
-      <label>결과 대본</label>
-      <textarea id="result"></textarea>
-    </div>
-
-    <div class="footer">
-      © AI Shorts Automation · GitHub Pages
-    </div>
-  </div>
-
-<script>
-function makeScript() {
-  const topic = document.getElementById("topic").value || "오늘의 이야기";
-  const cat = document.getElementById("category").value;
-  const tone = document.getElementById("tone").value;
-
-  const script =
-`[오프닝]
-${topic}… 이 얘기, 지금 꼭 해야 할 것 같았어요.
+[오프닝 훅]
+- 첫 줄에서 멈춰 세워라
+- 공감 / 불안 / 호기심 중 하나 선택
+- 질문 또는 단정적인 문장 사용
 
 [본문]
-많은 사람들이 ${cat} 때문에 흔들립니다.
-하지만 핵심은 하나예요.
-지금 이 순간, 내가 뭘 느끼는지 아는 것.
-
-조금만 멈추고,
-조금만 숨을 고르고,
-이 말 한 번만 기억하세요.
+- 3~5줄
+- 상황 → 감정 → 깨달음 흐름
+- 너무 해결하려 들지 말 것
+- ‘나만 그런가?’ 감정 유도
 
 [마무리]
-이 영상이 도움이 됐다면 저장해두세요.
-${tone} 톤으로, 다음 이야기에서 다시 만나요.`;
+- 여운 남기기
+- 저장/반복 시청 유도
+- 직접적인 “구독하세요” 금지
 
-  document.getElementById("result").value = script;
-}
-</script>
-</body>
-</html>
+────────────────
+[카테고리별 톤 가이드]
+
+▶ 힐링/감성
+- 조용하고 낮은 텐션
+- 위로하지만 정답은 말하지 않음
+- 혼잣말 같은 문장
+
+▶ 생활꿀팁
+- 단정하고 빠르게
+- “이거 모르고 살면 손해”
+- 바로 써먹을 수 있는 행동 제시
+
+▶ 공포/괴담
+- 음습하고 건조하게
+- 감정 설명 금지
+- 사실처럼 말할 것
+
+▶ 연애/관계
+- 공감 위주
+- 상대 비난 금지
+- “그럴 수도 있지” 톤
+
+▶ 자기계발
+- 의욕 과잉 금지
+- 작고 현실적인 변화 강조
+- 다짐보다 관찰
+
+▶ 복지/지원금
+- 사기 경고 포함
+- 과장 금지
+- ‘지금 확인’ 유도
+
+────────────────
+[말투 적용 규칙]
+
+- 담백: 군더더기 없는 문장
+- 다정: 위로와 여백
+- 음습: 감정 최소, 상황 강조
+- 빠름: 짧은 문장, 리듬감
+- 단호: 판단·결론 중심
+
+────────────────
+[출력 형식]
+
+===== 1 =====
+[오프닝]
+(한 줄)
+
+[본문]
+(3~5줄)
+
+[마무리]
+(1~2줄)
+
+(30개 생성 시 위 형식을 30번 반복)
+
+────────────────
+[중요]
+- 이모지 사용 금지
+- 불필요한 설명 금지
+- 프롬프트에 대한 설명 출력 금지
+- 오직 “쇼츠 대본”만 출력
